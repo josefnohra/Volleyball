@@ -694,6 +694,7 @@
         <table>
           <thead>
             <tr>
+              <th>Group</th>
               <th>Round</th>
               <th>Match</th>
               <th>Court</th>
@@ -711,6 +712,7 @@
               const status = get(row, ["Status"]);
               return `
                 <tr>
+                  <td>${escapeHTML(get(row, ["Group"]))}</td>
                   <td>${escapeHTML(get(row, ["Round"]))}</td>
                   <td>${escapeHTML(get(row, ["Match"]))}</td>
                   <td>${escapeHTML(get(row, ["Court"]))}</td>
