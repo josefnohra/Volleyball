@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JN League Volleyball Hub</title>
+  <style>
+    :root {
+      --bg: #020817;
+      --card: #111827;
+      --card2: rgba(17, 24, 39, 0.92);
+      --gold: #facc15;
+      --white: #ffffff;
+      --muted: #cbd5e1;
+      --line: rgba(255,255,255,0.18);
+      --green: #22c55e;
+      --red: #ef4444;
+      --blue: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #020817 0%, #111827 100%);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(1120px, 94%);
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(250,204,21,0.15), rgba(255,255,255,0.04));
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 8vw, 78px);
+      line-height: 0.95;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    h1 span {
+      color: var(--gold);
+      display: block;
+    }
+
+    .subtitle {
+      margin-top: 16px;
+      font-size: clamp(15px, 3vw, 22px);
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .admin-note {
+      margin-top: 14px;
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 22px 0 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--gold);
+      color: #07111f;
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .debug {
+      display: none;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fecaca;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 14px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .tournament-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .tournament-card {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      cursor: pointer;
+      transition: 0.18s;
+      box-shadow: 0 14px 34px rgba(0,0,0,0.25);
+    }
+
+    .tournament-card:hover,
+    .tournament-card.active {
+      transform: translateY(-2px);
+      border-color: rgba(250,204,21,0.85);
+      box-shadow: 0 18px 45px rgba(250,204,21,0.12);
+    }
+
+    .tid {
+      color: var(--gold);
+      font-weight: 900;
+      letter-spacing: .8px;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .tournament-card h3 {
+      margin: 8px 0 10px;
+      font-size: 22px;
+    }
+
+    .card-meta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      background: rgba(250,204,21,0.16);
+      color: var(--gold);
+      border: 1px solid rgba(250,204,21,0.4);
+      margin-top: 10px;
+    }
+
+    .details {
+      display: none;
+      margin-top: 22px;
+    }
+
+    .details.show {
+      display: block;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .info-card,
+    .section {
+      background: var(--card2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .info-card strong {
+      color: var(--gold);
+      display: block;
+      font-size: 13px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .info-card p {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .section {
+      margin-top: 22px;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-size: 24px;
+    }
+
+    .info-text {
+      color: var(--white);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+
+    .tab {
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border: 1px solid var(--line);
+    }
+
+    .tab.active {
+      background: var(--gold);
+      color: #06111f;
+      border-color: var(--gold);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.show {
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    th,
+    td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--gold);
+      text-transform: uppercase;
+      font-size: 13px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .status-finished {
+      color: #86efac;
+      font-weight: 900;
+    }
+
+    .status-live {
+      color: #fca5a5;
+      font-weight: 900;
+    }
+
+    .status-upcoming {
+      color: var(--gold);
+      font-weight: 900;
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 14px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .photo-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+      box-shadow: 0 14px 34px rgba(0,0,0,0.22);
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      display: block;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .photo-title {
+      padding: 12px;
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .playoff-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .playoff-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.04);
+    }
+    .playoff-card strong {
+      display: block;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .playoff-match {
+      color: var(--white);
+      font-weight: 900;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .playoff-score {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .playoff-winner {
+      color: #86efac;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 20px;
+      margin-top: 24px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 800px) {
+      .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      th,
+      td {
+        font-size: 13px;
+        padding: 10px 7px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .container {
+        width: 96%;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>JN League <span>Volleyball</span></h1>
+      <div class="subtitle">Tournament Hub • Live Scores • Standings</div>
+      <div class="admin-note">Updates automatically from Google Sheets</div>
+      <div id="errorBox" class="error"></div>
+    </header>
+
+    <div class="top-actions">
+      <button onclick="loadAll()">Refresh Data</button>
+      <div class="updated" id="updatedText">Loading tournaments...</div>
+    </div>
+
+    <div class="debug" id="debugBox" style="display:none;"></div>
+
+    <section class="section">
+      <h2>Tournaments</h2>
+      <div class="tournament-grid" id="tournamentGrid"></div>
+    </section>
+
+    <div id="details" class="details">
+      <section class="section">
+        <h2 id="tournamentTitle">Tournament Details</h2>
+        <p class="info-text" id="tournamentInfo"></p>
+      </section>
+
+      <div class="info-grid">
+        <div class="info-card"><strong>Date</strong><p id="infoDate">-</p></div>
+        <div class="info-card"><strong>Time</strong><p id="infoTime">-</p></div>
+        <div class="info-card"><strong>Location</strong><p id="infoLocation">-</p></div>
+        <div class="info-card"><strong>Format</strong><p id="infoFormat">-</p></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="showPanel(event, 'standingsPanel')">Standings</button>
+        <button class="tab" onclick="showPanel(event, 'schedulePanel')">Schedule & Scores</button>
+        <button class="tab" onclick="showPanel(event, 'rulesPanel')">Rules</button>
+        <button class="tab" onclick="showPanel(event, 'photosPanel')">Photos</button>
+      </div>
+
+      <section class="section panel show" id="standingsPanel">
+        <h2>Playoff / Finals Results</h2>
+        <div id="playoffResultsBox"></div>
+
+        <h2 style="margin-top:22px;">Group Stage Standings</h2>
+        <div id="standingsBox"></div>
+      </section>
+
+      <section class="section panel" id="schedulePanel">
+        <h2>Live Schedule & Scores</h2>
+        <div id="scheduleBox"></div>
+      </section>
+
+      <section class="section panel" id="rulesPanel">
+        <h2>Rules</h2>
+        <div id="rulesBox"></div>
+      </section>
+
+      <section class="section panel" id="photosPanel">
+        <h2>Photos</h2>
+        <div id="photosBox"></div>
+      </section>
+    </div>
+
+    <div class="footer">Play hard. Play fair. Everyone wins.</div>
+  </div>
+
+  <script>
+    const PUBLISHED_ID = "2PACX-1vSsj7c6UDCo2kBr3yomPQ_ZxfbPAkW38_pWA-9U6-5cS9pwUqvbiDagrPp9IVz_WcOv72ygooScm6XT";
+
+    const TABS = {
+      Tournaments: "452859579",
+      Schedule: "685832222",
+      Standings: "1132857043",
+      Rules: "1293352487",
+
+      // Add the GID number of your Google Sheets Photos tab here.
+      // Photos tab columns: TournamentID | PhotoTitle | PhotoURL
+      Photos: ""
+    };
+
+    let DATA = {
+      Tournaments: [],
+      Schedule: [],
+      Standings: [],
+      Rules: [],
+      Photos: []
+    };
+
+    let selectedTournamentID = null;
+
+    function csvUrl(gid) {
+      return `https://docs.google.com/spreadsheets/d/e/${PUBLISHED_ID}/pub?gid=${gid}&single=true&output=csv`;
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"' && insideQuotes && next === '"') {
+          cell += '"';
+          i++;
+        } else if (char === '"') {
+          insideQuotes = !insideQuotes;
+        } else if (char === "," && !insideQuotes) {
+          row.push(cell.trim());
+          cell = "";
+        } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+          if (char === "\r" && next === "\n") i++;
+          row.push(cell.trim());
+          if (row.some(Boolean)) rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+
+      row.push(cell.trim());
+      if (row.some(Boolean)) rows.push(row);
+
+      if (!rows.length) return [];
+
+      const headers = rows[0].map(h => h.trim());
+      return rows.slice(1).filter(r => r.some(Boolean)).map(r => {
+        const obj = {};
+        headers.forEach((header, index) => {
+          obj[header] = r[index] || "";
+        });
+        return obj;
+      });
+    }
+
+    async function loadCSV(tabName, gid) {
+      const response = await fetch(csvUrl(gid) + "&t=" + Date.now());
+      if (!response.ok) throw new Error(`Could not load ${tabName}`);
+      const text = await response.text();
+      return parseCSV(text);
+    }
+
+    async function loadOptionalCSV(tabName, gid) {
+      if (!gid) return [];
+      try {
+        return await loadCSV(tabName, gid);
+      } catch (error) {
+        console.warn(`${tabName} tab not loaded:`, error);
+        return [];
+      }
+    }
+
+    function cleanKey(key) {
+      return String(key || "").trim().replace(/\s+/g, "").replace(/_/g, "").toLowerCase();
+    }
+
+    function get(row, names) {
+      if (!row) return "";
+      for (const name of names) {
+        if (row[name] !== undefined && row[name] !== "") return row[name];
+      }
+      const keys = Object.keys(row);
+      for (const name of names) {
+        const found = keys.find(k => cleanKey(k) === cleanKey(name));
+        if (found && row[found] !== "") return row[found];
+      }
+      return "";
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, s => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[s]));
+    }
+
+    async function loadAll() {
+      const errorBox = document.getElementById("errorBox");
+      const debugBox = document.getElementById("debugBox");
+      errorBox.style.display = "none";
+      debugBox.style.display = "none";
+
+      try {
+        const results = await Promise.all([
+          loadCSV("Tournaments", TABS.Tournaments),
+          loadCSV("Schedule", TABS.Schedule),
+          loadCSV("Standings", TABS.Standings),
+          loadCSV("Rules", TABS.Rules),
+          loadOptionalCSV("Photos", TABS.Photos)
+        ]);
+
+        DATA.Tournaments = results[0];
+        DATA.Schedule = results[1];
+        DATA.Standings = results[2];
+        DATA.Rules = results[3];
+        DATA.Photos = results[4];
+
+        document.getElementById("updatedText").textContent =
+          "Last updated: " + new Date().toLocaleString();
+
+        debugBox.textContent =
+          `Tournaments: ${DATA.Tournaments.length} rows | Schedule: ${DATA.Schedule.length} rows | Standings: ${DATA.Standings.length} rows | Rules: ${DATA.Rules.length} rows | Photos: ${DATA.Photos.length} rows`;
+
+        renderTournamentCards();
+
+        if (DATA.Tournaments.length && !selectedTournamentID) {
+          const firstID = get(DATA.Tournaments[0], ["TournamentID", "ID"]);
+          selectTournament(firstID);
+        } else if (selectedTournamentID) {
+          selectTournament(selectedTournamentID);
+        }
+      } catch (error) {
+        errorBox.style.display = "block";
+        errorBox.textContent =
+          "Google Sheets not loading. Make sure the sheet is published to web as Entire document and the tab GIDs are correct.";
+      }
+    }
+
+    function renderTournamentCards() {
+      const grid = document.getElementById("tournamentGrid");
+      grid.innerHTML = "";
+
+      const tournaments = DATA.Tournaments.filter(t => get(t, ["TournamentID", "ID"]));
+
+      if (!tournaments.length) {
+        grid.innerHTML = `<div class="empty">No tournaments found. Add T1, T2, etc. in the Tournaments tab.</div>`;
+        return;
+      }
+
+      tournaments.forEach(tournament => {
+        const id = get(tournament, ["TournamentID", "ID"]);
+        const name = get(tournament, ["TournamentName", "Tournament Name", "Name"]);
+        const date = get(tournament, ["Date"]);
+        const time = get(tournament, ["Time"]);
+        const location = get(tournament, ["Location", "Venue", "Place"]);
+        const format = get(tournament, ["Format"]);
+        const sets = get(tournament, ["Sets", "SetsPerMatch"]);
+        const status = get(tournament, ["Status"]);
+
+        const card = document.createElement("div");
+        card.className = "tournament-card" + (id === selectedTournamentID ? " active" : "");
+        card.onclick = () => selectTournament(id);
+
+        card.innerHTML = `
+          <div class="tid">${escapeHTML(id)}</div>
+          <h3>${escapeHTML(name || "Tournament")}</h3>
+          <div class="card-meta">
+            📅 ${escapeHTML(date)} &nbsp; ⏰ ${escapeHTML(time)}<br>
+            📍 ${escapeHTML(location)}<br>
+            Format: ${escapeHTML(format)} | Sets: ${escapeHTML(sets)}
+          </div>
+          <span class="pill">${escapeHTML(status || "Open")}</span>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function selectTournament(id) {
+      selectedTournamentID = id;
+      renderTournamentCards();
+
+      const tournament = DATA.Tournaments.find(t => get(t, ["TournamentID", "ID"]) === id);
+      if (!tournament) return;
+
+      document.getElementById("details").classList.add("show");
+
+      const name = get(tournament, ["TournamentName", "Tournament Name", "Name"]);
+      document.getElementById("tournamentTitle").textContent =
+        `${id} - ${name || "Tournament"}`;
+
+      document.getElementById("tournamentInfo").textContent =
+        get(tournament, ["Info", "Notes", "TournamentInfo", "Tournament Info", "Details", "Description"]) ||
+        "No tournament information added yet.";
+
+      document.getElementById("infoDate").textContent = get(tournament, ["Date"]) || "-";
+      document.getElementById("infoTime").textContent = get(tournament, ["Time"]) || "-";
+      document.getElementById("infoLocation").textContent = get(tournament, ["Location", "Venue", "Place"]) || "-";
+
+      const format = get(tournament, ["Format"]) || "-";
+      const sets = get(tournament, ["Sets", "SetsPerMatch"]);
+      document.getElementById("infoFormat").textContent =
+        sets ? `${format} • Best of ${sets}` : format;
+
+      renderStandings(id);
+      renderSchedule(id);
+      renderRules(id);
+      renderPhotos(id);
+    }
+
+    function makeScore(row) {
+      const scores = [];
+      for (let i = 1; i <= 5; i++) {
+        const a = get(row, [`S${i}A`, `Set${i}A`]);
+        const b = get(row, [`S${i}B`, `Set${i}B`]);
+        if (a || b) scores.push(`${a || "__"}-${b || "__"}`);
+      }
+      return scores.join(", ") || "__ - __";
+    }
+
+    function statusClass(status) {
+      const s = String(status || "").toLowerCase();
+      if (s === "finished") return "status-finished";
+      if (s === "live") return "status-live";
+      return "status-upcoming";
+    }
+
+    function renderSchedule(tournamentID) {
+      const rows = DATA.Schedule.filter(row =>
+        get(row, ["TournamentID", "ID"]) === tournamentID
+      );
+
+      if (!rows.length) {
+        document.getElementById("scheduleBox").innerHTML =
+          `<div class="empty">No schedule yet for this tournament.</div>`;
+        return;
+      }
+
+      document.getElementById("scheduleBox").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Round</th>
+              <th>Match</th>
+              <th>Court</th>
+              <th>Team A</th>
+              <th>Team B</th>
+              <th>Score</th>
+              <th>Sets</th>
+              <th>Points</th>
+              <th>Winner</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => {
+              const status = get(row, ["Status"]);
+              return `
+                <tr>
+                  <td>${escapeHTML(get(row, ["Group"]))}</td>
+                  <td>${escapeHTML(get(row, ["Round"]))}</td>
+                  <td>${escapeHTML(get(row, ["Match"]))}</td>
+                  <td>${escapeHTML(get(row, ["Court"]))}</td>
+                  <td>${escapeHTML(get(row, ["TeamA", "Team A"]))}</td>
+                  <td>${escapeHTML(get(row, ["TeamB", "Team B"]))}</td>
+                  <td>${escapeHTML(makeScore(row))}</td>
+                  <td>${escapeHTML(get(row, ["SetsA", "Sets A"]))}-${escapeHTML(get(row, ["SetsB", "Sets B"]))}</td>
+                  <td><span class="pill">${escapeHTML(get(row, ["PointsA", "Points A"]) || "0")}-${escapeHTML(get(row, ["PointsB", "Points B"]) || "0")}</span></td>
+                  <td>${escapeHTML(get(row, ["Winner"]))}</td>
+                  <td><span class="${statusClass(status)}">${escapeHTML(status || "Upcoming")}</span></td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderStandings(tournamentID) {
+      renderPlayoffResults(tournamentID);
+
+      const rows = DATA.Standings.filter(row =>
+        get(row, ["TournamentID", "ID"]) === tournamentID
+      );
+
+      if (!rows.length) {
+        document.getElementById("standingsBox").innerHTML =
+          `<div class="empty">No standings yet. Enter scores in the sheet.</div>`;
+        return;
+      }
+
+      document.getElementById("standingsBox").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Group</th>
+              <th>Rank</th>
+              <th>Team</th>
+              <th>Played</th>
+              <th>Sets Won</th>
+              <th>Sets Lost</th>
+              <th>Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td>${escapeHTML(get(row, ["Group"]))}</td>
+                <td>${escapeHTML(get(row, ["Rank"]))}</td>
+                <td>${escapeHTML(get(row, ["Team"]))}</td>
+                <td>${escapeHTML(get(row, ["Played"]))}</td>
+                <td>${escapeHTML(get(row, ["Sets Won", "SetsWon"]))}</td>
+                <td>${escapeHTML(get(row, ["Sets Lost", "SetsLost"]))}</td>
+                <td><span class="pill">${escapeHTML(get(row, ["Points"]) || "0")} pts</span></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderPlayoffResults(tournamentID) {
+      const box = document.getElementById("playoffResultsBox");
+      if (!box) return;
+
+      const rows = DATA.Schedule.filter(row => {
+        const tid = get(row, ["TournamentID", "ID"]);
+        const group = String(get(row, ["Group"]) || "").toLowerCase();
+        const round = String(get(row, ["Round"]) || "").toLowerCase();
+        return tid === tournamentID && (
+          group === "playoffs" ||
+          group === "finals" ||
+          round === "semi final" ||
+          round === "final" ||
+          round === "3rd place"
+        );
+      });
+
+      if (!rows.length) {
+        box.innerHTML = "";
+        return;
+      }
+
+      const order = { "Final": 1, "3rd Place": 2, "Semi Final": 3 };
+
+      rows.sort((a, b) => {
+        const ar = get(a, ["Round"]);
+        const br = get(b, ["Round"]);
+        const ao = order[ar] || 9;
+        const bo = order[br] || 9;
+        if (ao !== bo) return ao - bo;
+        return String(get(a, ["Match"])).localeCompare(String(get(b, ["Match"])));
+      });
+
+      box.innerHTML = `
+        <div class="playoff-results">
+          ${rows.map(row => {
+            const round = get(row, ["Round"]) || "Playoff";
+            const match = get(row, ["Match"]);
+            const teamA = get(row, ["TeamA", "Team A"]);
+            const teamB = get(row, ["TeamB", "Team B"]);
+            const score = makeScore(row);
+            const winner = get(row, ["Winner"]);
+            const status = get(row, ["Status"]);
+
+            return `
+              <div class="playoff-card">
+                <strong>${escapeHTML(round)} ${match ? "• " + escapeHTML(match) : ""}</strong>
+                <div class="playoff-match">${escapeHTML(teamA)} vs ${escapeHTML(teamB)}</div>
+                <div class="playoff-score">Score: ${escapeHTML(score)} • Status: ${escapeHTML(status || "Upcoming")}</div>
+                ${winner ? `<div class="playoff-winner">Winner: ${escapeHTML(winner)}</div>` : ""}
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderRules(tournamentID) {
+      const rows = DATA.Rules.filter(row =>
+        get(row, ["TournamentID", "ID"]) === tournamentID
+      );
+
+      if (!rows.length) {
+        document.getElementById("rulesBox").innerHTML =
+          `<div class="empty">No rules added for this tournament.</div>`;
+        return;
+      }
+
+      document.getElementById("rulesBox").innerHTML = `
+        <div class="rules">
+          ${rows.map(row => `
+            <div class="rule" style="padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,0.04);margin-bottom:10px;">
+              <b style="color:var(--gold);display:block;margin-bottom:6px;">${escapeHTML(get(row, ["Title", "RuleTitle", "Rule Title"]))}</b>
+              ${escapeHTML(get(row, ["Details", "RuleDetails", "Rule Details"]))}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function safePhotoURL(url) {
+      const value = String(url || "").trim();
+      if (!value) return "";
+      if (value.startsWith("http://") || value.startsWith("https://")) return value;
+      return "";
+    }
+
+    function renderPhotos(tournamentID) {
+      const rows = DATA.Photos.filter(row =>
+        get(row, ["TournamentID", "ID"]) === tournamentID
+      );
+
+      if (!rows.length) {
+        document.getElementById("photosBox").innerHTML =
+          `<div class="empty">No photos added for this tournament yet.</div>`;
+        return;
+      }
+
+      document.getElementById("photosBox").innerHTML = `
+        <div class="photo-grid">
+          ${rows.map(row => {
+            const title = get(row, ["PhotoTitle", "Photo Title", "Title"]) || "Tournament Photo";
+            const url = safePhotoURL(get(row, ["PhotoURL", "Photo URL", "URL", "ImageURL", "Image URL"]));
+
+            if (!url) {
+              return `
+                <div class="photo-card">
+                  <div class="photo-title">${escapeHTML(title)}</div>
+                  <div class="empty" style="margin:12px;">Photo URL missing or not valid.</div>
+                </div>
+              `;
+            }
+
+            return `
+              <div class="photo-card">
+                <a href="${escapeHTML(url)}" target="_blank" rel="noopener">
+                  <img src="${escapeHTML(url)}" alt="${escapeHTML(title)}" loading="lazy">
+                </a>
+                <div class="photo-title">${escapeHTML(title)}</div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+
+    function showPanel(event, panelID) {
+      document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("show"));
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.remove("active"));
+      document.getElementById(panelID).classList.add("show");
+      event.target.classList.add("active");
+    }
+
+    loadAll();
+    setInterval(loadAll, 15000);
+  </script>
+</body>
+</html>
